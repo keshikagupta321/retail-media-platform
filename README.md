@@ -1,10 +1,6 @@
 # Real-Time Retail Media Analytics Platform
 
-**Author: Keshika Gupta — Tech Lead, 8.5 years Java backend, IOT83**
-
-> Built and run a similar pipeline in production: 72M IoT events/day,
-> Fortune 500 clients, exactly-once semantics, sub-second Druid queries.
-> This design applies the same engineering patterns to retail media.
+This document describes a scalable multi-tenant streaming platform for processing retailer advertising events and generating real-time campaign insights.
 
 ---
 
