@@ -27,6 +27,11 @@
 
 ## 1. Architecture Overview
 
+![Architecture Diagram](architecture.png)
+
+![Deployment Diagram](deployment.png)
+
+
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         EVENT SOURCES                                │
