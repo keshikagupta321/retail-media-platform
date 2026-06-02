@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: retail-media-insights-api
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 1s
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        enable.idempotence: true      # safe retries, broker deduplicates
+        acks: all                     # wait for all ISR replicas
+        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+
+server:
+  port: 8080
+
+druid:
+  url: ${DRUID_URL:http://localhost:8888}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  pattern:
+    console: '{"ts":"%d","level":"%p","traceId":"%X{traceId}","tenantId":"%X{tenantId}","msg":"%m"}%n'
+  level:
+    com.retailmedia: INFO

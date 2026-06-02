@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports: ["2181:2181"]
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on: [zookeeper]
+    ports: ["9092:9092"]
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_NUM_PARTITIONS: 25
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.0
+    depends_on: [kafka]
+    ports: ["8081:8081"]
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+  postgres:
+    image: postgres:16-alpine
+    ports: ["5432:5432"]
+    environment:
+      POSTGRES_DB: retail_media
+      POSTGRES_USER: retailmedia
+      POSTGRES_PASSWORD: localdev
+    volumes:
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # Druid single-node (local dev only — production uses full cluster)
+  druid:
+    image: apache/druid:29.0.0
+    ports:
+      - "8888:8888"   # Router (query endpoint)
+      - "8081:8081"   # Coordinator
+    environment:
+      DRUID_SINGLE_NODE_CONF: micro-quickstart
+    volumes:
+      - ./docker/druid-init:/opt/druid/var/druid
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    depends_on: [kafka, schema-registry]
+    ports: ["8090:8080"]
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
