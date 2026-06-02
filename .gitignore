@@ -1,0 +1,16 @@
+# Mac files
+.DS_Store
+**/.DS_Store
+
+# Build outputs
+target/
+*.class
+*.jar
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
