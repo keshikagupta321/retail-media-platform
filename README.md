@@ -96,16 +96,11 @@ This document describes a scalable multi-tenant streaming platform for processin
 | Stateless routing | **KsqlDB** | SQL routing rules — ops changes rules without developer deployment. Stateless = no savepoints. | Custom consumer (code deployment for rule changes). |
 | Stateful processing | **Apache Flink** | True streaming (not micro-batch). Session windows for attribution. Savepoints for zero-downtime upgrades. Sub-100ms latency. | Spark Streaming (500ms min micro-batch — too slow for attribution). |
 | Real-time store | **Redis Cluster** | Atomic INCR — sub-millisecond, no race conditions with concurrent pods. Auto-TTL. | DynamoDB (20ms). Memcached (no persistence). |
-| Analytics store | **Apache Druid** | Pre-aggregation at ingestion (rollup) — 72M raw events → 7M aggregated. Native Kafka ingestion. Datasource-per-tenant isolation. **Production proven: achieved 8s→80ms improvement at IOT83.** | ClickHouse (evaluated — simpler ops, SQL-native, but Druid's rollup + Kafka-native better for this time-series IoT/ad use case). Elasticsearch (not OLAP). |
+| Analytics store | **Apache Druid** | Pre-aggregation at ingestion (rollup). Native Kafka ingestion. Datasource-per-tenant isolation.| ClickHouse (evaluated — simpler ops, SQL-native, but Druid's rollup + Kafka-native better for this time-series IoT/ad use case). Elasticsearch (not OLAP). |
 | Data lake | **Apache Iceberg** | ACID for concurrent Flink + Spark writes. Time travel for audits. Schema evolution without rewrites. Namespace-per-tenant. | Raw Parquet (no ACID — concurrent writes corrupt). Delta Lake (Spark-first, less Flink native support). |
 | Metadata | **PostgreSQL** | ACID, relational, familiar. Campaign configs, attribution rules, tenant settings. | MongoDB (no joins for relational data). |
 | API layer | **Spring Boot 3 + WebFlux** | Reactive — handles 10K concurrent dashboard requests without proportional threads. Non-blocking Redis + Druid. Production expertise. | Spring MVC (thread per request — 10K threads = 10GB RAM just for stacks). |
 | Deployment | **AWS EKS + Helm + ArgoCD** | GitOps — rollback = git revert = 2 minutes. HPA on Kafka consumer lag (not CPU). | EC2 manual ops. |
-
-> **On Druid vs ClickHouse:** I evaluated both. ClickHouse is simpler to operate and SQL-native.
-> I chose Druid because I have run it in production at IOT83 at Fortune 500 scale — I know
-> how to tune it, fix it at 3AM, and the rollup pre-aggregation is exactly what high-volume
-> ad event analytics needs. That production confidence is worth more than theoretical simplicity.
 
 ---
 
