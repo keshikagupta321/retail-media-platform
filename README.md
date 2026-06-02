@@ -555,3 +555,12 @@ docker-compose.yml
 docker/druid-init/
 docker/postgres-init.sql
 ```
+---
+
+## Future Enhancements
+
+- Cross-device identity resolution
+- ML-based attribution
+- Real-time anomaly detection
+- Budget pacing optimization
+- Campaign forecasting
