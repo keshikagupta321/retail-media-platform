@@ -552,7 +552,6 @@ src/test/
 ├── controller/CampaignInsightsControllerTest.java
 └── service/CampaignInsightsServiceTest.java
 docker-compose.yml
-docker/druid-init/
 docker/postgres-init.sql
 ```
 ---
