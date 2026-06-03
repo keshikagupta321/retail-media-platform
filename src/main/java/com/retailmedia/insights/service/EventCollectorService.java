@@ -2,8 +2,8 @@ package com.retailmedia.insights.service;
 
 import com.retailmedia.insights.event.AdEvent;
 import com.retailmedia.insights.repository.RedisMetricsRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -31,13 +31,21 @@ import java.time.Duration;
  * Same user → same partition → same consumer → in-order processing.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class EventCollectorService {
 
     private final ReactiveRedisTemplate<String, String> stringRedisTemplate;
     private final RedisMetricsRepository redisMetricsRepo;
     private final KafkaTemplate<String, AdEvent> kafkaTemplate;
+
+    public EventCollectorService(
+            @Qualifier("dedupRedisTemplate") ReactiveRedisTemplate<String, String> stringRedisTemplate,
+            RedisMetricsRepository redisMetricsRepo,
+            KafkaTemplate<String, AdEvent> kafkaTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
+        this.redisMetricsRepo = redisMetricsRepo;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     private static final Duration DEDUP_TTL = Duration.ofHours(24);
     private static final String DEDUP_PREFIX = "dedup:event:";

@@ -19,7 +19,7 @@ spring:
         schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
 
 server:
-  port: 8080
+  port: 8082
 
 druid:
   url: ${DRUID_URL:http://localhost:8888}

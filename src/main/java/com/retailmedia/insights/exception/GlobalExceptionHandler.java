@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.server.MissingRequestValueException;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,11 @@ public class GlobalExceptionHandler {
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                 .findFirst().orElse("Validation failed");
         return Mono.just(ResponseEntity.badRequest().body(error("VALIDATION_ERROR", msg)));
+    }
+
+    @ExceptionHandler(MissingRequestValueException.class)
+    public Mono<ResponseEntity<Map<String, Object>>> missingRequestValue(MissingRequestValueException e) {
+        return Mono.just(ResponseEntity.badRequest().body(error("BAD_REQUEST", e.getReason())));
     }
 
     @ExceptionHandler(Exception.class)
